@@ -15,6 +15,9 @@ GRAY = (128, 128, 128)
 BLUE = (0, 0, 255)
 YELLOW = (255, 255, 0)  # Màu vàng để vẽ đường đi sau khi hoàn thành
 
+# Time
+TIME_SLEEP = 0.01
+
 # Hàm đọc dữ liệu từ file
 def load_data(filename):
     with open(filename, 'r') as file:
@@ -70,7 +73,7 @@ def dfs(grid, start, goals, screen):
         # Vẽ ô đang duyệt với màu xanh dương
         grid.draw_cell(screen, current, BLUE)
         pygame.display.flip()
-        time.sleep(0.3)  # Tạm dừng một chút để quan sát
+        time.sleep(TIME_SLEEP)  # Tạm dừng một chút để quan sát
 
         if current in goals:
             return path, nodes_expanded
@@ -99,7 +102,7 @@ def bfs(grid, start, goals, screen):
         # Vẽ ô đang duyệt với màu xanh dương
         grid.draw_cell(screen, current, BLUE)
         pygame.display.flip()
-        time.sleep(0.3)  # Tạm dừng một chút để quan sát
+        time.sleep(TIME_SLEEP)  # Tạm dừng một chút để quan sát
 
         if current in goals:
             return path, nodes_expanded
@@ -136,7 +139,7 @@ def a_star(grid, start, goals, screen):
         # Vẽ ô đang duyệt với màu xanh dương
         grid.draw_cell(screen, current, BLUE)
         pygame.display.flip()
-        time.sleep(0.3)  # Tạm dừng một chút để quan sát
+        time.sleep(TIME_SLEEP)  # Tạm dừng một chút để quan sát
 
         if current in goals:
             return path, nodes_expanded
@@ -170,7 +173,7 @@ def gbfs(grid, start, goals, screen):
         # Vẽ ô đang duyệt với màu xanh dương
         grid.draw_cell(screen, current, BLUE)
         pygame.display.flip()
-        time.sleep(0.3)  # Tạm dừng một chút để quan sát
+        time.sleep(TIME_SLEEP)  # Tạm dừng một chút để quan sát
 
         if current in goals:
             return path, nodes_expanded
@@ -230,7 +233,7 @@ def ucs(grid, start, goals, screen):
         # Vẽ ô đang duyệt với màu xanh dương
         grid.draw_cell(screen, current, BLUE)
         pygame.display.flip()
-        time.sleep(0.3)  # Tạm dừng một chút để quan sát
+        time.sleep(TIME_SLEEP)  # Tạm dừng một chút để quan sát
 
         if current in goals:
             return path, nodes_expanded

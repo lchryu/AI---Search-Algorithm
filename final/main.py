@@ -1,4 +1,3 @@
-import heapq
 import sys
 from collections import deque
 import pygame
@@ -18,8 +17,7 @@ YELLOW = (255, 255, 0)  # Màu vàng để vẽ đường đi sau khi hoàn thà
 LIGHT_BLUE = (173, 216, 230)  # A lighter shade of blue for visited (closed) nodes
 
 # Time
-TIME_SLEEP = 0.05
-
+TIME_SLEEP = 0.1
 
 # Hàm đọc dữ liệu từ file
 def load_data(filename):
@@ -60,48 +58,113 @@ class Grid:
         pygame.draw.rect(screen, color, pygame.Rect(pos[0] * CELL_SIZE, pos[1] * CELL_SIZE, CELL_SIZE, CELL_SIZE))
         pygame.draw.rect(screen, BLACK, pygame.Rect(pos[0] * CELL_SIZE, pos[1] * CELL_SIZE, CELL_SIZE, CELL_SIZE), 1)
 
+# Tìm kiếm DFS
 def dfs(grid, start, goals, screen):
-    stack = [(start, [])]  # Stack holds the current position and the path to it
+    stack = [(start, [])]
     visited = set([start])
     nodes_expanded = 0
 
-    moves = [(0, 1), (0, -1), (1, 0), (-1, 0)]  # Movements: right, left, down, up
-
+    moves = [(0, 1), (0, -1), (1, 0), (-1, 0)]
+    
     while stack:
         current, path = stack.pop()
         nodes_expanded += 1
         path = path + [current]
-
-        # Vẽ ô đang duyệt với màu xanh dương (đang xét)
+        
+        # Vẽ ô đang duyệt với màu xanh dương
         grid.draw_cell(screen, current, BLUE)
         pygame.display.flip()
         time.sleep(TIME_SLEEP)  # Tạm dừng một chút để quan sát
 
-        # Nếu tìm thấy mục tiêu, trả về đường đi và số lượng nút đã mở rộng
         if current in goals:
             return path, nodes_expanded
-
-        # Mở rộng các ô lân cận
+        
         for move in moves:
             next_pos = (current[0] + move[0], current[1] + move[1])
-
-            # Kiểm tra xem ô mới có nằm trong lưới, chưa được thăm, và không phải là tường
             if 0 <= next_pos[1] < len(grid.grid) and 0 <= next_pos[0] < len(grid.grid[0]) and next_pos not in visited and not grid.is_wall(next_pos[0], next_pos[1]):
                 visited.add(next_pos)
                 stack.append((next_pos, path))
-
-                # Vẽ ô lân cận được thêm vào stack (đang mở rộng)
-                grid.draw_cell(screen, next_pos, BLUE)
-                pygame.display.flip()
-                time.sleep(TIME_SLEEP)
-
-        # Vẽ ô đã duyệt xong (backtracking) với màu xanh nhạt
-        grid.draw_cell(screen, current, LIGHT_BLUE)
-        pygame.display.flip()
-        time.sleep(TIME_SLEEP)
-
-    # Nếu không tìm thấy đường đi, trả về None và số nút đã mở rộng
+    
     return None, nodes_expanded
+
+# Tìm kiếm DFS với trực quan hóa (tô màu cho backtracking giống BFS)
+# def dfs(grid, start, goals, screen):
+#     stack = [(start, [])]  # Stack holds the current position and the path to it
+#     visited = set([start])
+#     nodes_expanded = 0
+
+#     moves = [(0, 1), (0, -1), (1, 0), (-1, 0)]  # Movements: right, left, down, up
+
+#     while stack:
+#         current, path = stack.pop()
+#         nodes_expanded += 1
+#         path = path + [current]
+
+#         # Vẽ ô đang duyệt với màu xanh dương (đang xét)
+#         grid.draw_cell(screen, current, BLUE)
+#         pygame.display.flip()
+#         time.sleep(TIME_SLEEP)  # Tạm dừng một chút để quan sát
+
+#         # Nếu tìm thấy mục tiêu, trả về đường đi và số lượng nút đã mở rộng
+#         if current in goals:
+#             return path, nodes_expanded
+
+#         # Flag to check if we are expanding any neighbors
+#         expanded = False
+
+#         # Mở rộng các ô lân cận
+#         for move in moves:
+#             next_pos = (current[0] + move[0], current[1] + move[1])
+
+#             # Kiểm tra xem ô mới có nằm trong lưới, chưa được thăm, và không phải là tường
+#             if 0 <= next_pos[1] < len(grid.grid) and 0 <= next_pos[0] < len(grid.grid[0]) and next_pos not in visited and not grid.is_wall(next_pos[0], next_pos[1]):
+#                 visited.add(next_pos)
+#                 stack.append((next_pos, path))
+
+#                 # Vẽ ô lân cận được thêm vào stack (đang mở rộng)
+#                 grid.draw_cell(screen, next_pos, BLUE)
+#                 pygame.display.flip()
+#                 time.sleep(TIME_SLEEP)
+
+#                 expanded = True
+
+#         # Nếu không mở rộng thêm được ô nào, nghĩa là đã backtrack xong
+#         if not expanded:
+#             grid.draw_cell(screen, current, LIGHT_BLUE)  # Đánh dấu ô đã duyệt xong
+#             pygame.display.flip()
+#             time.sleep(TIME_SLEEP)
+
+#     # Nếu không tìm thấy đường đi, trả về None và số nút đã mở rộng
+#     return None, nodes_expanded
+
+# # Tìm kiếm BFS
+# def bfs(grid, start, goals, screen):
+#     queue = deque([(start, [])])
+#     visited = set([start])
+#     nodes_expanded = 0
+
+#     moves = [(0, 1), (0, -1), (1, 0), (-1, 0)]
+    
+#     while queue:
+#         current, path = queue.popleft()
+#         nodes_expanded += 1
+#         path = path + [current]
+        
+#         # Vẽ ô đang duyệt với màu xanh dương
+#         grid.draw_cell(screen, current, BLUE)
+#         pygame.display.flip()
+#         time.sleep(TIME_SLEEP)  # Tạm dừng một chút để quan sát
+
+#         if current in goals:
+#             return path, nodes_expanded
+        
+#         for move in moves:
+#             next_pos = (current[0] + move[0], current[1] + move[1])
+#             if 0 <= next_pos[1] < len(grid.grid) and 0 <= next_pos[0] < len(grid.grid[0]) and next_pos not in visited and not grid.is_wall(next_pos[0], next_pos[1]):
+#                 visited.add(next_pos)
+#                 queue.append((next_pos, path))
+    
+#     return None, nodes_expanded
 
 # BFS with Visualization
 def bfs(grid, start, goals, screen):
@@ -146,13 +209,13 @@ def bfs(grid, start, goals, screen):
 
     return None, nodes_expanded
 
+import heapq
 
 # Hàm tính khoảng cách Manhattan
 def manhattan_distance(pos1, pos2):
     return abs(pos1[0] - pos2[0]) + abs(pos1[1] - pos2[1])
 
-
-# A* Search với trực quan hóa
+# A* Search
 def a_star(grid, start, goals, screen):
     pq = []
     heapq.heappush(pq, (0, 0, start, []))
@@ -160,99 +223,138 @@ def a_star(grid, start, goals, screen):
     cost_from_start = {start: 0}
     nodes_expanded = 0
 
-    moves = [(0, 1), (0, -1), (1, 0), (-1, 0)]  # Possible movements (right, left, down, up)
+    moves = [(0, 1), (0, -1), (1, 0), (-1, 0)]
 
     while pq:
-        # Lấy ô có chi phí nhỏ nhất ra khỏi hàng đợi ưu tiên
         _, g, current, path = heapq.heappop(pq)
         nodes_expanded += 1
         path = path + [current]
 
-        # Vẽ ô đang duyệt với màu xanh dương (ô đang xét)
+        # Vẽ ô đang duyệt với màu xanh dương
         grid.draw_cell(screen, current, BLUE)
         pygame.display.flip()
-        time.sleep(TIME_SLEEP)  # Tạm dừng để quan sát
+        time.sleep(TIME_SLEEP)  # Tạm dừng một chút để quan sát
 
-        # Nếu tìm thấy mục tiêu, trả về đường đi và số lượng nút đã mở rộng
         if current in goals:
             return path, nodes_expanded
 
-        # Khám phá các ô lân cận
         for move in moves:
             next_pos = (current[0] + move[0], current[1] + move[1])
             new_cost = g + 1  # Giả sử chi phí di chuyển giữa các ô là 1
-            if 0 <= next_pos[1] < len(grid.grid[0]) and 0 <= next_pos[0] < len(grid.grid) and not grid.is_wall(next_pos[0], next_pos[1]):
+            if 0 <= next_pos[1] < len(grid.grid) and 0 <= next_pos[0] < len(grid.grid[0]) and not grid.is_wall(next_pos[0], next_pos[1]):
                 if next_pos not in visited or new_cost < cost_from_start.get(next_pos, float('inf')):
                     cost_from_start[next_pos] = new_cost
                     priority = new_cost + min(manhattan_distance(next_pos, goal) for goal in goals)
                     heapq.heappush(pq, (priority, new_cost, next_pos, path))
                     visited.add(next_pos)
 
-                    # Vẽ ô lân cận được thêm vào hàng đợi với màu xanh dương
-                    grid.draw_cell(screen, next_pos, BLUE)
-                    pygame.display.flip()
-                    time.sleep(TIME_SLEEP)
-
-        # Vẽ ô đã duyệt xong (backtracking) với màu xanh nhạt
-        grid.draw_cell(screen, current, LIGHT_BLUE)
-        pygame.display.flip()
-        time.sleep(TIME_SLEEP)
-
-    # Nếu không tìm thấy đường, trả về None và số lượng nút đã mở rộng
     return None, nodes_expanded
 
-
-# Greedy Best-First Search (GBFS) with visualization and proper boundary handling
+# Greedy Best-First Search
 def gbfs(grid, start, goals, screen):
     pq = []
-    heapq.heappush(pq, (0, start, []))  # Initialize priority queue with (heuristic, start, path)
+    heapq.heappush(pq, (0, start, []))
     visited = set([start])
     nodes_expanded = 0
 
-    moves = [(0, 1), (0, -1), (1, 0), (-1, 0)]  # Movement directions: right, left, down, up
+    moves = [(0, 1), (0, -1), (1, 0), (-1, 0)]
 
     while pq:
-        _, current, path = heapq.heappop(pq)  # Pop the node with the lowest heuristic
+        _, current, path = heapq.heappop(pq)
         nodes_expanded += 1
         path = path + [current]
 
-        # Draw the current node (blue) - being explored
+        # Vẽ ô đang duyệt với màu xanh dương
         grid.draw_cell(screen, current, BLUE)
         pygame.display.flip()
-        time.sleep(TIME_SLEEP)  # Short pause for visualization
+        time.sleep(TIME_SLEEP)  # Tạm dừng một chút để quan sát
 
-        # If goal is reached, color the final path and return result
         if current in goals:
-            # Color the path with yellow
-            for pos in path:
-                grid.draw_cell(screen, pos, YELLOW)
-                pygame.display.flip()
-                time.sleep(TIME_SLEEP)
             return path, nodes_expanded
 
-        # Explore neighbors
         for move in moves:
             next_pos = (current[0] + move[0], current[1] + move[1])
-
-            # Boundary check is no longer needed here because is_wall() handles it
-            if next_pos not in visited and not grid.is_wall(next_pos[0], next_pos[1]):
+            if 0 <= next_pos[1] < len(grid.grid) and 0 <= next_pos[0] < len(grid.grid[0]) and next_pos not in visited and not grid.is_wall(next_pos[0], next_pos[1]):
                 visited.add(next_pos)
-                # Priority based on Manhattan distance to the nearest goal
                 priority = min(manhattan_distance(next_pos, goal) for goal in goals)
                 heapq.heappush(pq, (priority, next_pos, path))
 
-                # Draw the neighbor node (blue) - added to the queue
-                grid.draw_cell(screen, next_pos, BLUE)
-                pygame.display.flip()
-                time.sleep(TIME_SLEEP)
-
-        # Mark the current node as fully explored (light blue) - backtracked
-        grid.draw_cell(screen, current, LIGHT_BLUE)
-        pygame.display.flip()
-        time.sleep(TIME_SLEEP)
-
-    # If no path is found, return None and the number of nodes expanded
     return None, nodes_expanded
+
+
+# # CUS1 - Iterative Deepening Search
+# def depth_limited_search(grid, current, goals, depth, path, visited):
+#     if depth == 0 and current in goals:
+#         return path + [current]
+#     if depth > 0:
+#         moves = [(0, 1), (0, -1), (1, 0), (-1, 0)]
+#         for move in moves:
+#             next_pos = (current[0] + move[0], current[1] + move[1])
+#             if 0 <= next_pos[1] < len(grid.grid) and 0 <= next_pos[0] < len(grid.grid[0]) and not grid.is_wall(next_pos[0], next_pos[1]) and next_pos not in visited:
+#                 visited.add(next_pos)
+#                 result = depth_limited_search(grid, next_pos, goals, depth - 1, path + [current], visited)
+#                 if result:
+#                     return result
+#     return None
+
+# def ids(grid, start, goals, screen):
+#     depth = 0
+#     nodes_expanded = 0
+
+#     while True:
+#         visited = set([start])
+#         result = depth_limited_search(grid, start, goals, depth, [], visited)
+#         nodes_expanded += len(visited)
+#         if result:
+#             return result, nodes_expanded
+#         depth += 1
+# CUS1 - Iterative Deepening Search with Visualization
+# def depth_limited_search(grid, current, goals, depth, path, visited, screen):
+#     if depth == 0 and current in goals:
+#         return path + [current]
+    
+#     if depth > 0:
+#         moves = [(0, 1), (0, -1), (1, 0), (-1, 0)]
+#         for move in moves:
+#             next_pos = (current[0] + move[0], current[1] + move[1])
+            
+#             if 0 <= next_pos[1] < len(grid.grid) and 0 <= next_pos[0] < len(grid.grid[0]) and not grid.is_wall(next_pos[0], next_pos[1]) and next_pos not in visited:
+#                 visited.add(next_pos)
+#                 path.append(current)
+                
+#                 # Visualize exploring node
+#                 grid.draw_cell(screen, next_pos, BLUE)  
+#                 pygame.display.flip()
+#                 time.sleep(TIME_SLEEP)
+                
+#                 result = depth_limited_search(grid, next_pos, goals, depth - 1, path, visited, screen)
+                
+#                 # If we found a result, return it
+#                 if result:
+#                     return result
+                
+#                 # If not found, mark the node as fully explored (closed)
+#                 grid.draw_cell(screen, next_pos, LIGHT_BLUE)
+#                 pygame.display.flip()
+#                 time.sleep(TIME_SLEEP)
+                
+#     return None
+
+# def ids(grid, start, goals, screen):
+#     depth = 0
+#     nodes_expanded = 0
+
+#     while True:
+#         visited = set([start])
+#         result = depth_limited_search(grid, start, goals, depth, [], visited, screen)
+#         nodes_expanded += len(visited)
+#         if result:
+#             return result, nodes_expanded
+#         depth += 1
+
+
+
+# Constants for visualization
 
 # CUS1 - Iterative Deepening Search with Visualization
 def depth_limited_search(grid, current, goals, depth, path, visited, screen):
@@ -298,6 +400,36 @@ def ids(grid, start, goals, screen):
             return result, nodes_expanded
         depth += 1
 
+# # CUS2 - Uniform Cost Search (UCS)
+# def ucs(grid, start, goals, screen):
+#     pq = []
+#     heapq.heappush(pq, (0, start, []))
+#     visited = set([start])
+#     nodes_expanded = 0
+
+#     moves = [(0, 1), (0, -1), (1, 0), (-1, 0)]
+
+#     while pq:
+#         g, current, path = heapq.heappop(pq)
+#         nodes_expanded += 1
+#         path = path + [current]
+
+#         # Vẽ ô đang duyệt với màu xanh dương
+#         grid.draw_cell(screen, current, BLUE)
+#         pygame.display.flip()
+#         time.sleep(TIME_SLEEP)  # Tạm dừng một chút để quan sát
+
+#         if current in goals:
+#             return path, nodes_expanded
+
+#         for move in moves:
+#             next_pos = (current[0] + move[0], current[1] + move[1])
+#             if 0 <= next_pos[1] < len(grid.grid) and 0 <= next_pos[0] < len(grid.grid[0]) and not grid.is_wall(next_pos[0], next_pos[1]):
+#                 if next_pos not in visited:
+#                     heapq.heappush(pq, (g + 1, next_pos, path))
+#                     visited.add(next_pos)
+
+#     return None, nodes_expanded
 
 
 

@@ -373,10 +373,9 @@ def main():
     for goal in goals:
         grid.draw_cell(screen, goal, GREEN)  # Vẽ các điểm đích
     pygame.display.flip()
-    
+    time.sleep(10)
     # Chạy thuật toán tìm kiếm theo lựa chọn
-    if algorithm == "DFS": path, nodes_expanded = dfs(grid, start, goals)
-    elif algorithm == "DFS_GUI": path, nodes_expanded = dfs_gui(grid, start, goals, screen)
+    if algorithm == "DFS": path, nodes_expanded = dfs(grid, start, goals, screen)
     elif algorithm == "BFS":
         path, nodes_expanded = bfs(grid, start, goals, screen)
     elif algorithm == "GBFS":
